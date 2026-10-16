@@ -61,4 +61,5 @@ func TestService_IntegrationTest_NewEvent(t *testing.T) {
 	assert.Equal(t, "soccer", final.Event.SportTypeID)
 	assert.Equal(t, "Soccer", final.Event.SportName)
 	assert.Equal(t, "New Market", final.Event.Markets[0].Name.Value)
+	assert.Equal(t, false, final.Event.Hidden)
 }

@@ -33,6 +33,7 @@ message SportEvent {
     OptionalString Region   = 2; 
     OptionalString League   = 3; 
     OptionalString Round    = 4; 
+    bool           Hidden   = 5;
 }
 
 // Market models a market of betting options e.g Head to Head or Totals

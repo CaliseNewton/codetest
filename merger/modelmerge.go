@@ -83,6 +83,8 @@ func MergeSportEvent(ctx context.Context, left, right *model.SportEvent) *model.
 	result.Region = MergeOptionalString(ctx, left.Region, right.Region)
 	result.League = MergeOptionalString(ctx, left.League, right.League)
 	result.Round = MergeOptionalString(ctx, left.Round, right.Round)
+	result.Hidden = right.Hidden
+
 	return result
 }
 

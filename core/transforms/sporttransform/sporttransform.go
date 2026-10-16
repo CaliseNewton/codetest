@@ -36,7 +36,11 @@ func (t *sporttransformClient) TransformEvent(_ context.Context, parialUpdate, f
 		return outDelta, nil // unknown sport type so dont change anything
 	}
 
-	outDelta = &model.Event{ID: parialUpdate.ID, SportData: &model.SportEvent{Name: &model.OptionalString{Value: sportName}}}
+	// Carry Hidden forward from the full model, otherwise the merge treats the missing bool as false and resets it
+	outDelta = &model.Event{ID: parialUpdate.ID, SportData: &model.SportEvent{
+		Name:   &model.OptionalString{Value: sportName},
+		Hidden: fullModel.GetSportData().GetHidden(),
+	}}
 
 	return outDelta, nil
 }
