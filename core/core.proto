@@ -32,6 +32,7 @@ message SportEvent {
     string                  SportName       = 7;
     string                  Region          = 8;
     string                  League          = 9;
+    bool                    Hidden          = 10;
     string                  Round           = 11;
 }
 

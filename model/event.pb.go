@@ -344,6 +344,7 @@ type SportEvent struct {
 	Region        *OptionalString        `protobuf:"bytes,2,opt,name=Region,proto3" json:"Region,omitempty"`
 	League        *OptionalString        `protobuf:"bytes,3,opt,name=League,proto3" json:"League,omitempty"`
 	Round         *OptionalString        `protobuf:"bytes,4,opt,name=Round,proto3" json:"Round,omitempty"`
+	Hidden        bool                   `protobuf:"varint,5,opt,name=Hidden,proto3" json:"Hidden,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -401,6 +402,13 @@ func (x *SportEvent) GetRound() *OptionalString {
 	return nil
 }
 
+func (x *SportEvent) GetHidden() bool {
+	if x != nil {
+		return x.Hidden
+	}
+	return false
+}
+
 func (x *SportEvent) SetName(v *OptionalString) {
 	x.Name = v
 }
@@ -415,6 +423,10 @@ func (x *SportEvent) SetLeague(v *OptionalString) {
 
 func (x *SportEvent) SetRound(v *OptionalString) {
 	x.Round = v
+}
+
+func (x *SportEvent) SetHidden(v bool) {
+	x.Hidden = v
 }
 
 func (x *SportEvent) HasName() bool {
@@ -468,6 +480,7 @@ type SportEvent_builder struct {
 	Region *OptionalString
 	League *OptionalString
 	Round  *OptionalString
+	Hidden bool
 }
 
 func (b0 SportEvent_builder) Build() *SportEvent {
@@ -478,6 +491,7 @@ func (b0 SportEvent_builder) Build() *SportEvent {
 	x.Region = b.Region
 	x.League = b.League
 	x.Round = b.Round
+	x.Hidden = b.Hidden
 	return m0
 }
 
@@ -989,13 +1003,14 @@ const file_event_proto_rawDesc = "" +
 	"\rBettingStatus\x18\x04 \x01(\v2\x1c.model.OptionalBettingStatusR\rBettingStatus\x12'\n" +
 	"\aMarkets\x18\x05 \x03(\v2\r.model.MarketR\aMarkets\x127\n" +
 	"\vEventTypeID\x18\x06 \x01(\v2\x15.model.OptionalStringR\vEventTypeID\x12/\n" +
-	"\tSportData\x18\a \x01(\v2\x11.model.SportEventR\tSportData\"\xc2\x01\n" +
+	"\tSportData\x18\a \x01(\v2\x11.model.SportEventR\tSportData\"\xda\x01\n" +
 	"\n" +
 	"SportEvent\x12)\n" +
 	"\x04Name\x18\x01 \x01(\v2\x15.model.OptionalStringR\x04Name\x12-\n" +
 	"\x06Region\x18\x02 \x01(\v2\x15.model.OptionalStringR\x06Region\x12-\n" +
 	"\x06League\x18\x03 \x01(\v2\x15.model.OptionalStringR\x06League\x12+\n" +
-	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05Round\"\xed\x01\n" +
+	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05Round\x12\x16\n" +
+	"\x06Hidden\x18\x05 \x01(\bR\x06Hidden\"\xed\x01\n" +
 	"\x06Market\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12)\n" +
 	"\x04Name\x18\x02 \x01(\v2\x15.model.OptionalStringR\x04Name\x122\n" +
