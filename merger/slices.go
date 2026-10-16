@@ -5,7 +5,7 @@ import (
 	"math"
 	"sort"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/model"
 )
 
 // MergeMarketSlice merges two slices of markets

@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/model"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )

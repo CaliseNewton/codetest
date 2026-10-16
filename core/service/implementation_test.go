@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core/repository"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core/service"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms/sporttransform"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/merger"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/core"
+	"github.com/CaliseNewton/codetest/core/repository"
+	"github.com/CaliseNewton/codetest/core/service"
+	"github.com/CaliseNewton/codetest/core/transforms"
+	"github.com/CaliseNewton/codetest/core/transforms/sporttransform"
+	"github.com/CaliseNewton/codetest/merger"
+	"github.com/CaliseNewton/codetest/model"
 	"github.com/stretchr/testify/assert"
 )
 

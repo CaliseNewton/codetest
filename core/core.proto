@@ -4,7 +4,7 @@ package core;
 
 import  "model/event.proto";
 
-option go_package = "git.neds.sh/technology/pricekinetics/tools/codetest/core";
+option go_package = "github.com/CaliseNewton/codetest/core";
 
 message UpdateRequest {
     model.Event Event = 1;

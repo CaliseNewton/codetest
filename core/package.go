@@ -4,7 +4,7 @@ package core
 import (
 	"time"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/model"
 )
 
 //go:generate ./gen-proto.sh

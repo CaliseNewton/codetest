@@ -9,11 +9,12 @@
 package core
 
 import (
-	model "git.neds.sh/technology/pricekinetics/tools/codetest/model"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	unsafe "unsafe"
+
+	model "github.com/CaliseNewton/codetest/model"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (

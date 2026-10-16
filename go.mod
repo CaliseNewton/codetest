@@ -1,4 +1,4 @@
-module git.neds.sh/technology/pricekinetics/tools/codetest
+module github.com/CaliseNewton/codetest
 
 go 1.25.0
 

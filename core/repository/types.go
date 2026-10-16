@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/model"
 )
 
 // Repository is an interface for something that can Retrieve, Update and remove Events from a persistance layer

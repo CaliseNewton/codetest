@@ -5,10 +5,10 @@ import (
 	"context"
 	"fmt"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core/repository"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/merger"
+	"github.com/CaliseNewton/codetest/core"
+	"github.com/CaliseNewton/codetest/core/repository"
+	"github.com/CaliseNewton/codetest/core/transforms"
+	"github.com/CaliseNewton/codetest/merger"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )

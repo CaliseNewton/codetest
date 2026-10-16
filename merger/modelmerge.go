@@ -7,7 +7,8 @@ package merger
 
 import (
 	"context"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+
+	"github.com/CaliseNewton/codetest/model"
 )
 
 // MergeBettingStatus generates a merged value between two members of the enumeration BettingStatus

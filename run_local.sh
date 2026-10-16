@@ -9,4 +9,4 @@ export APP_LOG_LEVEL=debug
 
 docker-compose up -d
 
-./core
+./core.exe

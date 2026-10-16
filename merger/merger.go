@@ -3,7 +3,7 @@ package merger
 import (
 	"context"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/model"
 )
 
 type ServiceClient interface {

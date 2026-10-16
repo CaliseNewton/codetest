@@ -4,8 +4,8 @@ package sporttransform
 import (
 	"context"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms"
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/core/transforms"
+	"github.com/CaliseNewton/codetest/model"
 )
 
 type sporttransformClient struct{}

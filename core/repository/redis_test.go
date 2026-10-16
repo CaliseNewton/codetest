@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/model"
 	"github.com/stretchr/testify/assert"
 )
 

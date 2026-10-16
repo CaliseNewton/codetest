@@ -4,7 +4,7 @@ package transforms
 import (
 	"context"
 
-	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
+	"github.com/CaliseNewton/codetest/model"
 )
 
 // TransformClient is an interface representing a service that can perform transformations ion a model
