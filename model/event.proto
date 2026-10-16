@@ -25,15 +25,41 @@ message Event {
     repeated Market         Markets         = 5; 
     OptionalString          EventTypeID     = 6; 
     SportEvent              SportData       = 7;
+    bool                    Hidden          = 8;
+    RaceEvent               RacingData      = 9;
 }
 
 // SportEvent models event details that are specific to sports
 message SportEvent {
-    OptionalString Name     = 1; 
-    OptionalString Region   = 2; 
-    OptionalString League   = 3; 
-    OptionalString Round    = 4; 
-    bool           Hidden   = 5;
+    reserved 5; // previously Hidden, moved to Event
+    OptionalString Name     = 1;
+    OptionalString Region   = 2;
+    OptionalString League   = 3;
+    OptionalString Round    = 4;
+}
+
+enum RaceType {
+    RaceUnknown = 0;
+    Horse       = 1;
+    Greyhound   = 2;
+    Harness     = 3;
+}
+
+message OptionalRaceType {
+    RaceType Value   = 1;
+    bool     Deleted = 2;
+}
+
+// RaceEvent models event details that are specific to horse / greyhound / harness racing
+message RaceEvent {
+    OptionalRaceType RaceType       = 1;
+    OptionalString   Venue          = 2;
+    OptionalInt64    RaceNumber     = 3;
+    OptionalInt64    DistanceMetres = 4;
+    OptionalString   TrackCondition = 5;
+    OptionalString   Weather        = 6;
+    OptionalString   Country        = 7;
+    OptionalString   RaceClass      = 8;
 }
 
 // Market models a market of betting options e.g Head to Head or Totals

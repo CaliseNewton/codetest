@@ -39,9 +39,7 @@ func Test_redisRepo_UpdateEvent(t *testing.T) {
 				},
 			},
 		},
-		SportData: &model.SportEvent{
-			Hidden: false,
-		},
+		Hidden: true, // non-default value so the round trip proves it is persisted
 	}
 
 	updErr := repo.UpdateEvent(context.Background(), input)
@@ -52,7 +50,7 @@ func Test_redisRepo_UpdateEvent(t *testing.T) {
 	assert.Equal(t, input.BettingStatus.Value, output.BettingStatus.Value)
 	assert.Equal(t, input.Markets[0].Name.Value, output.Markets[0].Name.Value)
 	assert.Equal(t, input.Markets[0].Selections[0].Name.Value, output.Markets[0].Selections[0].Name.Value)
-	assert.Equal(t, input.SportData.Hidden, output.SportData.Hidden)
+	assert.Equal(t, input.Hidden, output.Hidden)
 	delErr := repo.DeleteEventByID(context.Background(), input.ID)
 	assert.NoError(t, delErr)
 }
