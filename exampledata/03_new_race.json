@@ -1,0 +1,74 @@
+{
+    "Event": {
+        "Markets": [
+            {
+                "ID": "WIN",
+                "Name": {
+                    "Value": "Win"
+                },
+                "BettingStatus": {
+                    "Value": "BettingOpen"
+                },
+                "Selections": [
+                    {
+                        "ID": "runner-1",
+                        "Name": {
+                            "Value": "1. Fast Horse"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 3.50
+                        }
+                    },
+                    {
+                        "ID": "runner-2",
+                        "Name": {
+                            "Value": "2. Slow Horse"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 12.00
+                        }
+                    }
+                ]
+            }
+        ],
+        "ID": "testRace",
+        "StartTime": {
+            "Value": 1758142685635000000
+        },
+        "BettingStatus": {
+            "Value": "BettingOpen"
+        },
+        "EventTypeID": {
+            "Value": "horse_racing"
+        },
+        "RacingData": {
+            "Venue": {
+                "Value": "Randwick"
+            },
+            "RaceNumber": {
+                "Value": 3
+            },
+            "DistanceMetres": {
+                "Value": 1200
+            },
+            "TrackCondition": {
+                "Value": "Good 4"
+            },
+            "Weather": {
+                "Value": "Fine"
+            },
+            "Country": {
+                "Value": "AUS"
+            },
+            "RaceClass": {
+                "Value": "Benchmark 78"
+            }
+        }
+    }
+}

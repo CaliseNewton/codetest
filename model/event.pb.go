@@ -69,6 +69,53 @@ func (x BettingStatus) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
+type RaceType int32
+
+const (
+	RaceType_RaceUnknown RaceType = 0
+	RaceType_Horse       RaceType = 1
+	RaceType_Greyhound   RaceType = 2
+	RaceType_Harness     RaceType = 3
+)
+
+// Enum value maps for RaceType.
+var (
+	RaceType_name = map[int32]string{
+		0: "RaceUnknown",
+		1: "Horse",
+		2: "Greyhound",
+		3: "Harness",
+	}
+	RaceType_value = map[string]int32{
+		"RaceUnknown": 0,
+		"Horse":       1,
+		"Greyhound":   2,
+		"Harness":     3,
+	}
+)
+
+func (x RaceType) Enum() *RaceType {
+	p := new(RaceType)
+	*p = x
+	return p
+}
+
+func (x RaceType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RaceType) Descriptor() protoreflect.EnumDescriptor {
+	return file_event_proto_enumTypes[1].Descriptor()
+}
+
+func (RaceType) Type() protoreflect.EnumType {
+	return &file_event_proto_enumTypes[1]
+}
+
+func (x RaceType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
 type OptionalBettingStatus struct {
 	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         BettingStatus          `protobuf:"varint,1,opt,name=Value,proto3,enum=model.BettingStatus" json:"Value,omitempty"`
@@ -150,6 +197,8 @@ type Event struct {
 	Markets       []*Market              `protobuf:"bytes,5,rep,name=Markets,proto3" json:"Markets,omitempty"`
 	EventTypeID   *OptionalString        `protobuf:"bytes,6,opt,name=EventTypeID,proto3" json:"EventTypeID,omitempty"`
 	SportData     *SportEvent            `protobuf:"bytes,7,opt,name=SportData,proto3" json:"SportData,omitempty"`
+	Hidden        bool                   `protobuf:"varint,8,opt,name=Hidden,proto3" json:"Hidden,omitempty"`
+	RacingData    *RaceEvent             `protobuf:"bytes,9,opt,name=RacingData,proto3" json:"RacingData,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -228,6 +277,20 @@ func (x *Event) GetSportData() *SportEvent {
 	return nil
 }
 
+func (x *Event) GetHidden() bool {
+	if x != nil {
+		return x.Hidden
+	}
+	return false
+}
+
+func (x *Event) GetRacingData() *RaceEvent {
+	if x != nil {
+		return x.RacingData
+	}
+	return nil
+}
+
 func (x *Event) SetID(v string) {
 	x.ID = v
 }
@@ -254,6 +317,14 @@ func (x *Event) SetEventTypeID(v *OptionalString) {
 
 func (x *Event) SetSportData(v *SportEvent) {
 	x.SportData = v
+}
+
+func (x *Event) SetHidden(v bool) {
+	x.Hidden = v
+}
+
+func (x *Event) SetRacingData(v *RaceEvent) {
+	x.RacingData = v
 }
 
 func (x *Event) HasName() bool {
@@ -291,6 +362,13 @@ func (x *Event) HasSportData() bool {
 	return x.SportData != nil
 }
 
+func (x *Event) HasRacingData() bool {
+	if x == nil {
+		return false
+	}
+	return x.RacingData != nil
+}
+
 func (x *Event) ClearName() {
 	x.Name = nil
 }
@@ -311,6 +389,10 @@ func (x *Event) ClearSportData() {
 	x.SportData = nil
 }
 
+func (x *Event) ClearRacingData() {
+	x.RacingData = nil
+}
+
 type Event_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -321,6 +403,8 @@ type Event_builder struct {
 	Markets       []*Market
 	EventTypeID   *OptionalString
 	SportData     *SportEvent
+	Hidden        bool
+	RacingData    *RaceEvent
 }
 
 func (b0 Event_builder) Build() *Event {
@@ -334,6 +418,8 @@ func (b0 Event_builder) Build() *Event {
 	x.Markets = b.Markets
 	x.EventTypeID = b.EventTypeID
 	x.SportData = b.SportData
+	x.Hidden = b.Hidden
+	x.RacingData = b.RacingData
 	return m0
 }
 
@@ -344,7 +430,6 @@ type SportEvent struct {
 	Region        *OptionalString        `protobuf:"bytes,2,opt,name=Region,proto3" json:"Region,omitempty"`
 	League        *OptionalString        `protobuf:"bytes,3,opt,name=League,proto3" json:"League,omitempty"`
 	Round         *OptionalString        `protobuf:"bytes,4,opt,name=Round,proto3" json:"Round,omitempty"`
-	Hidden        bool                   `protobuf:"varint,5,opt,name=Hidden,proto3" json:"Hidden,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -402,13 +487,6 @@ func (x *SportEvent) GetRound() *OptionalString {
 	return nil
 }
 
-func (x *SportEvent) GetHidden() bool {
-	if x != nil {
-		return x.Hidden
-	}
-	return false
-}
-
 func (x *SportEvent) SetName(v *OptionalString) {
 	x.Name = v
 }
@@ -423,10 +501,6 @@ func (x *SportEvent) SetLeague(v *OptionalString) {
 
 func (x *SportEvent) SetRound(v *OptionalString) {
 	x.Round = v
-}
-
-func (x *SportEvent) SetHidden(v bool) {
-	x.Hidden = v
 }
 
 func (x *SportEvent) HasName() bool {
@@ -480,7 +554,6 @@ type SportEvent_builder struct {
 	Region *OptionalString
 	League *OptionalString
 	Round  *OptionalString
-	Hidden bool
 }
 
 func (b0 SportEvent_builder) Build() *SportEvent {
@@ -491,7 +564,321 @@ func (b0 SportEvent_builder) Build() *SportEvent {
 	x.Region = b.Region
 	x.League = b.League
 	x.Round = b.Round
-	x.Hidden = b.Hidden
+	return m0
+}
+
+type OptionalRaceType struct {
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
+	Value         RaceType               `protobuf:"varint,1,opt,name=Value,proto3,enum=model.RaceType" json:"Value,omitempty"`
+	Deleted       bool                   `protobuf:"varint,2,opt,name=Deleted,proto3" json:"Deleted,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OptionalRaceType) Reset() {
+	*x = OptionalRaceType{}
+	mi := &file_event_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OptionalRaceType) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OptionalRaceType) ProtoMessage() {}
+
+func (x *OptionalRaceType) ProtoReflect() protoreflect.Message {
+	mi := &file_event_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *OptionalRaceType) GetValue() RaceType {
+	if x != nil {
+		return x.Value
+	}
+	return RaceType_RaceUnknown
+}
+
+func (x *OptionalRaceType) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+func (x *OptionalRaceType) SetValue(v RaceType) {
+	x.Value = v
+}
+
+func (x *OptionalRaceType) SetDeleted(v bool) {
+	x.Deleted = v
+}
+
+type OptionalRaceType_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value   RaceType
+	Deleted bool
+}
+
+func (b0 OptionalRaceType_builder) Build() *OptionalRaceType {
+	m0 := &OptionalRaceType{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Deleted = b.Deleted
+	return m0
+}
+
+// RaceEvent models event details that are specific to horse / greyhound / harness racing
+type RaceEvent struct {
+	state          protoimpl.MessageState `protogen:"hybrid.v1"`
+	RaceType       *OptionalRaceType      `protobuf:"bytes,1,opt,name=RaceType,proto3" json:"RaceType,omitempty"`
+	Venue          *OptionalString        `protobuf:"bytes,2,opt,name=Venue,proto3" json:"Venue,omitempty"`
+	RaceNumber     *OptionalInt64         `protobuf:"bytes,3,opt,name=RaceNumber,proto3" json:"RaceNumber,omitempty"`
+	DistanceMetres *OptionalInt64         `protobuf:"bytes,4,opt,name=DistanceMetres,proto3" json:"DistanceMetres,omitempty"`
+	TrackCondition *OptionalString        `protobuf:"bytes,5,opt,name=TrackCondition,proto3" json:"TrackCondition,omitempty"`
+	Weather        *OptionalString        `protobuf:"bytes,6,opt,name=Weather,proto3" json:"Weather,omitempty"`
+	Country        *OptionalString        `protobuf:"bytes,7,opt,name=Country,proto3" json:"Country,omitempty"`
+	RaceClass      *OptionalString        `protobuf:"bytes,8,opt,name=RaceClass,proto3" json:"RaceClass,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RaceEvent) Reset() {
+	*x = RaceEvent{}
+	mi := &file_event_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RaceEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RaceEvent) ProtoMessage() {}
+
+func (x *RaceEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_event_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *RaceEvent) GetRaceType() *OptionalRaceType {
+	if x != nil {
+		return x.RaceType
+	}
+	return nil
+}
+
+func (x *RaceEvent) GetVenue() *OptionalString {
+	if x != nil {
+		return x.Venue
+	}
+	return nil
+}
+
+func (x *RaceEvent) GetRaceNumber() *OptionalInt64 {
+	if x != nil {
+		return x.RaceNumber
+	}
+	return nil
+}
+
+func (x *RaceEvent) GetDistanceMetres() *OptionalInt64 {
+	if x != nil {
+		return x.DistanceMetres
+	}
+	return nil
+}
+
+func (x *RaceEvent) GetTrackCondition() *OptionalString {
+	if x != nil {
+		return x.TrackCondition
+	}
+	return nil
+}
+
+func (x *RaceEvent) GetWeather() *OptionalString {
+	if x != nil {
+		return x.Weather
+	}
+	return nil
+}
+
+func (x *RaceEvent) GetCountry() *OptionalString {
+	if x != nil {
+		return x.Country
+	}
+	return nil
+}
+
+func (x *RaceEvent) GetRaceClass() *OptionalString {
+	if x != nil {
+		return x.RaceClass
+	}
+	return nil
+}
+
+func (x *RaceEvent) SetRaceType(v *OptionalRaceType) {
+	x.RaceType = v
+}
+
+func (x *RaceEvent) SetVenue(v *OptionalString) {
+	x.Venue = v
+}
+
+func (x *RaceEvent) SetRaceNumber(v *OptionalInt64) {
+	x.RaceNumber = v
+}
+
+func (x *RaceEvent) SetDistanceMetres(v *OptionalInt64) {
+	x.DistanceMetres = v
+}
+
+func (x *RaceEvent) SetTrackCondition(v *OptionalString) {
+	x.TrackCondition = v
+}
+
+func (x *RaceEvent) SetWeather(v *OptionalString) {
+	x.Weather = v
+}
+
+func (x *RaceEvent) SetCountry(v *OptionalString) {
+	x.Country = v
+}
+
+func (x *RaceEvent) SetRaceClass(v *OptionalString) {
+	x.RaceClass = v
+}
+
+func (x *RaceEvent) HasRaceType() bool {
+	if x == nil {
+		return false
+	}
+	return x.RaceType != nil
+}
+
+func (x *RaceEvent) HasVenue() bool {
+	if x == nil {
+		return false
+	}
+	return x.Venue != nil
+}
+
+func (x *RaceEvent) HasRaceNumber() bool {
+	if x == nil {
+		return false
+	}
+	return x.RaceNumber != nil
+}
+
+func (x *RaceEvent) HasDistanceMetres() bool {
+	if x == nil {
+		return false
+	}
+	return x.DistanceMetres != nil
+}
+
+func (x *RaceEvent) HasTrackCondition() bool {
+	if x == nil {
+		return false
+	}
+	return x.TrackCondition != nil
+}
+
+func (x *RaceEvent) HasWeather() bool {
+	if x == nil {
+		return false
+	}
+	return x.Weather != nil
+}
+
+func (x *RaceEvent) HasCountry() bool {
+	if x == nil {
+		return false
+	}
+	return x.Country != nil
+}
+
+func (x *RaceEvent) HasRaceClass() bool {
+	if x == nil {
+		return false
+	}
+	return x.RaceClass != nil
+}
+
+func (x *RaceEvent) ClearRaceType() {
+	x.RaceType = nil
+}
+
+func (x *RaceEvent) ClearVenue() {
+	x.Venue = nil
+}
+
+func (x *RaceEvent) ClearRaceNumber() {
+	x.RaceNumber = nil
+}
+
+func (x *RaceEvent) ClearDistanceMetres() {
+	x.DistanceMetres = nil
+}
+
+func (x *RaceEvent) ClearTrackCondition() {
+	x.TrackCondition = nil
+}
+
+func (x *RaceEvent) ClearWeather() {
+	x.Weather = nil
+}
+
+func (x *RaceEvent) ClearCountry() {
+	x.Country = nil
+}
+
+func (x *RaceEvent) ClearRaceClass() {
+	x.RaceClass = nil
+}
+
+type RaceEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	RaceType       *OptionalRaceType
+	Venue          *OptionalString
+	RaceNumber     *OptionalInt64
+	DistanceMetres *OptionalInt64
+	TrackCondition *OptionalString
+	Weather        *OptionalString
+	Country        *OptionalString
+	RaceClass      *OptionalString
+}
+
+func (b0 RaceEvent_builder) Build() *RaceEvent {
+	m0 := &RaceEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.RaceType = b.RaceType
+	x.Venue = b.Venue
+	x.RaceNumber = b.RaceNumber
+	x.DistanceMetres = b.DistanceMetres
+	x.TrackCondition = b.TrackCondition
+	x.Weather = b.Weather
+	x.Country = b.Country
+	x.RaceClass = b.RaceClass
 	return m0
 }
 
@@ -509,7 +896,7 @@ type Market struct {
 
 func (x *Market) Reset() {
 	*x = Market{}
-	mi := &file_event_proto_msgTypes[3]
+	mi := &file_event_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -521,7 +908,7 @@ func (x *Market) String() string {
 func (*Market) ProtoMessage() {}
 
 func (x *Market) ProtoReflect() protoreflect.Message {
-	mi := &file_event_proto_msgTypes[3]
+	mi := &file_event_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -655,7 +1042,7 @@ type Selection struct {
 
 func (x *Selection) Reset() {
 	*x = Selection{}
-	mi := &file_event_proto_msgTypes[4]
+	mi := &file_event_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -667,7 +1054,7 @@ func (x *Selection) String() string {
 func (*Selection) ProtoMessage() {}
 
 func (x *Selection) ProtoReflect() protoreflect.Message {
-	mi := &file_event_proto_msgTypes[4]
+	mi := &file_event_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -785,7 +1172,7 @@ type OptionalString struct {
 
 func (x *OptionalString) Reset() {
 	*x = OptionalString{}
-	mi := &file_event_proto_msgTypes[5]
+	mi := &file_event_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -797,7 +1184,7 @@ func (x *OptionalString) String() string {
 func (*OptionalString) ProtoMessage() {}
 
 func (x *OptionalString) ProtoReflect() protoreflect.Message {
-	mi := &file_event_proto_msgTypes[5]
+	mi := &file_event_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -856,7 +1243,7 @@ type OptionalDouble struct {
 
 func (x *OptionalDouble) Reset() {
 	*x = OptionalDouble{}
-	mi := &file_event_proto_msgTypes[6]
+	mi := &file_event_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -868,7 +1255,7 @@ func (x *OptionalDouble) String() string {
 func (*OptionalDouble) ProtoMessage() {}
 
 func (x *OptionalDouble) ProtoReflect() protoreflect.Message {
-	mi := &file_event_proto_msgTypes[6]
+	mi := &file_event_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -927,7 +1314,7 @@ type OptionalInt64 struct {
 
 func (x *OptionalInt64) Reset() {
 	*x = OptionalInt64{}
-	mi := &file_event_proto_msgTypes[7]
+	mi := &file_event_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -939,7 +1326,7 @@ func (x *OptionalInt64) String() string {
 func (*OptionalInt64) ProtoMessage() {}
 
 func (x *OptionalInt64) ProtoReflect() protoreflect.Message {
-	mi := &file_event_proto_msgTypes[7]
+	mi := &file_event_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -995,7 +1382,7 @@ const file_event_proto_rawDesc = "" +
 	"\vevent.proto\x12\x05model\"]\n" +
 	"\x15OptionalBettingStatus\x12*\n" +
 	"\x05Value\x18\x01 \x01(\x0e2\x14.model.BettingStatusR\x05Value\x12\x18\n" +
-	"\aDeleted\x18\x02 \x01(\bR\aDeleted\"\xcd\x02\n" +
+	"\aDeleted\x18\x02 \x01(\bR\aDeleted\"\x97\x03\n" +
 	"\x05Event\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12)\n" +
 	"\x04Name\x18\x02 \x01(\v2\x15.model.OptionalStringR\x04Name\x122\n" +
@@ -1003,14 +1390,31 @@ const file_event_proto_rawDesc = "" +
 	"\rBettingStatus\x18\x04 \x01(\v2\x1c.model.OptionalBettingStatusR\rBettingStatus\x12'\n" +
 	"\aMarkets\x18\x05 \x03(\v2\r.model.MarketR\aMarkets\x127\n" +
 	"\vEventTypeID\x18\x06 \x01(\v2\x15.model.OptionalStringR\vEventTypeID\x12/\n" +
-	"\tSportData\x18\a \x01(\v2\x11.model.SportEventR\tSportData\"\xda\x01\n" +
+	"\tSportData\x18\a \x01(\v2\x11.model.SportEventR\tSportData\x12\x16\n" +
+	"\x06Hidden\x18\b \x01(\bR\x06Hidden\x120\n" +
+	"\n" +
+	"RacingData\x18\t \x01(\v2\x10.model.RaceEventR\n" +
+	"RacingData\"\xc8\x01\n" +
 	"\n" +
 	"SportEvent\x12)\n" +
 	"\x04Name\x18\x01 \x01(\v2\x15.model.OptionalStringR\x04Name\x12-\n" +
 	"\x06Region\x18\x02 \x01(\v2\x15.model.OptionalStringR\x06Region\x12-\n" +
 	"\x06League\x18\x03 \x01(\v2\x15.model.OptionalStringR\x06League\x12+\n" +
-	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05Round\x12\x16\n" +
-	"\x06Hidden\x18\x05 \x01(\bR\x06Hidden\"\xed\x01\n" +
+	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05RoundJ\x04\b\x05\x10\x06\"S\n" +
+	"\x10OptionalRaceType\x12%\n" +
+	"\x05Value\x18\x01 \x01(\x0e2\x0f.model.RaceTypeR\x05Value\x12\x18\n" +
+	"\aDeleted\x18\x02 \x01(\bR\aDeleted\"\xb7\x03\n" +
+	"\tRaceEvent\x123\n" +
+	"\bRaceType\x18\x01 \x01(\v2\x17.model.OptionalRaceTypeR\bRaceType\x12+\n" +
+	"\x05Venue\x18\x02 \x01(\v2\x15.model.OptionalStringR\x05Venue\x124\n" +
+	"\n" +
+	"RaceNumber\x18\x03 \x01(\v2\x14.model.OptionalInt64R\n" +
+	"RaceNumber\x12<\n" +
+	"\x0eDistanceMetres\x18\x04 \x01(\v2\x14.model.OptionalInt64R\x0eDistanceMetres\x12=\n" +
+	"\x0eTrackCondition\x18\x05 \x01(\v2\x15.model.OptionalStringR\x0eTrackCondition\x12/\n" +
+	"\aWeather\x18\x06 \x01(\v2\x15.model.OptionalStringR\aWeather\x12/\n" +
+	"\aCountry\x18\a \x01(\v2\x15.model.OptionalStringR\aCountry\x123\n" +
+	"\tRaceClass\x18\b \x01(\v2\x15.model.OptionalStringR\tRaceClass\"\xed\x01\n" +
 	"\x06Market\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12)\n" +
 	"\x04Name\x18\x02 \x01(\v2\x15.model.OptionalStringR\x04Name\x122\n" +
@@ -1037,45 +1441,63 @@ const file_event_proto_rawDesc = "" +
 	"\x0eBettingUnknown\x10\x00\x12\x0f\n" +
 	"\vBettingOpen\x10\x01\x12\x14\n" +
 	"\x10BettingSuspended\x10\x02\x12\x11\n" +
-	"\rBettingClosed\x10\x03B(Z&github.com/CaliseNewton/codetest/modelb\x06proto3"
+	"\rBettingClosed\x10\x03*B\n" +
+	"\bRaceType\x12\x0f\n" +
+	"\vRaceUnknown\x10\x00\x12\t\n" +
+	"\x05Horse\x10\x01\x12\r\n" +
+	"\tGreyhound\x10\x02\x12\v\n" +
+	"\aHarness\x10\x03B(Z&github.com/CaliseNewton/codetest/modelb\x06proto3"
 
-var file_event_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_event_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_event_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_event_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_event_proto_goTypes = []any{
 	(BettingStatus)(0),            // 0: model.BettingStatus
-	(*OptionalBettingStatus)(nil), // 1: model.OptionalBettingStatus
-	(*Event)(nil),                 // 2: model.Event
-	(*SportEvent)(nil),            // 3: model.SportEvent
-	(*Market)(nil),                // 4: model.Market
-	(*Selection)(nil),             // 5: model.Selection
-	(*OptionalString)(nil),        // 6: model.OptionalString
-	(*OptionalDouble)(nil),        // 7: model.OptionalDouble
-	(*OptionalInt64)(nil),         // 8: model.OptionalInt64
+	(RaceType)(0),                 // 1: model.RaceType
+	(*OptionalBettingStatus)(nil), // 2: model.OptionalBettingStatus
+	(*Event)(nil),                 // 3: model.Event
+	(*SportEvent)(nil),            // 4: model.SportEvent
+	(*OptionalRaceType)(nil),      // 5: model.OptionalRaceType
+	(*RaceEvent)(nil),             // 6: model.RaceEvent
+	(*Market)(nil),                // 7: model.Market
+	(*Selection)(nil),             // 8: model.Selection
+	(*OptionalString)(nil),        // 9: model.OptionalString
+	(*OptionalDouble)(nil),        // 10: model.OptionalDouble
+	(*OptionalInt64)(nil),         // 11: model.OptionalInt64
 }
 var file_event_proto_depIdxs = []int32{
 	0,  // 0: model.OptionalBettingStatus.Value:type_name -> model.BettingStatus
-	6,  // 1: model.Event.Name:type_name -> model.OptionalString
-	8,  // 2: model.Event.StartTime:type_name -> model.OptionalInt64
-	1,  // 3: model.Event.BettingStatus:type_name -> model.OptionalBettingStatus
-	4,  // 4: model.Event.Markets:type_name -> model.Market
-	6,  // 5: model.Event.EventTypeID:type_name -> model.OptionalString
-	3,  // 6: model.Event.SportData:type_name -> model.SportEvent
-	6,  // 7: model.SportEvent.Name:type_name -> model.OptionalString
-	6,  // 8: model.SportEvent.Region:type_name -> model.OptionalString
-	6,  // 9: model.SportEvent.League:type_name -> model.OptionalString
-	6,  // 10: model.SportEvent.Round:type_name -> model.OptionalString
-	6,  // 11: model.Market.Name:type_name -> model.OptionalString
-	8,  // 12: model.Market.StartTime:type_name -> model.OptionalInt64
-	1,  // 13: model.Market.BettingStatus:type_name -> model.OptionalBettingStatus
-	5,  // 14: model.Market.Selections:type_name -> model.Selection
-	6,  // 15: model.Selection.Name:type_name -> model.OptionalString
-	1,  // 16: model.Selection.BettingStatus:type_name -> model.OptionalBettingStatus
-	7,  // 17: model.Selection.Price:type_name -> model.OptionalDouble
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	9,  // 1: model.Event.Name:type_name -> model.OptionalString
+	11, // 2: model.Event.StartTime:type_name -> model.OptionalInt64
+	2,  // 3: model.Event.BettingStatus:type_name -> model.OptionalBettingStatus
+	7,  // 4: model.Event.Markets:type_name -> model.Market
+	9,  // 5: model.Event.EventTypeID:type_name -> model.OptionalString
+	4,  // 6: model.Event.SportData:type_name -> model.SportEvent
+	6,  // 7: model.Event.RacingData:type_name -> model.RaceEvent
+	9,  // 8: model.SportEvent.Name:type_name -> model.OptionalString
+	9,  // 9: model.SportEvent.Region:type_name -> model.OptionalString
+	9,  // 10: model.SportEvent.League:type_name -> model.OptionalString
+	9,  // 11: model.SportEvent.Round:type_name -> model.OptionalString
+	1,  // 12: model.OptionalRaceType.Value:type_name -> model.RaceType
+	5,  // 13: model.RaceEvent.RaceType:type_name -> model.OptionalRaceType
+	9,  // 14: model.RaceEvent.Venue:type_name -> model.OptionalString
+	11, // 15: model.RaceEvent.RaceNumber:type_name -> model.OptionalInt64
+	11, // 16: model.RaceEvent.DistanceMetres:type_name -> model.OptionalInt64
+	9,  // 17: model.RaceEvent.TrackCondition:type_name -> model.OptionalString
+	9,  // 18: model.RaceEvent.Weather:type_name -> model.OptionalString
+	9,  // 19: model.RaceEvent.Country:type_name -> model.OptionalString
+	9,  // 20: model.RaceEvent.RaceClass:type_name -> model.OptionalString
+	9,  // 21: model.Market.Name:type_name -> model.OptionalString
+	11, // 22: model.Market.StartTime:type_name -> model.OptionalInt64
+	2,  // 23: model.Market.BettingStatus:type_name -> model.OptionalBettingStatus
+	8,  // 24: model.Market.Selections:type_name -> model.Selection
+	9,  // 25: model.Selection.Name:type_name -> model.OptionalString
+	2,  // 26: model.Selection.BettingStatus:type_name -> model.OptionalBettingStatus
+	10, // 27: model.Selection.Price:type_name -> model.OptionalDouble
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_event_proto_init() }
@@ -1088,8 +1510,8 @@ func file_event_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_event_proto_rawDesc), len(file_event_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   8,
+			NumEnums:      2,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

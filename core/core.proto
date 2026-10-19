@@ -36,9 +36,36 @@ message SportEvent {
     string                  Round           = 11;
 }
 
+message GetRacingEventRequest {
+    string EventID = 1;
+}
+
+message GetRacingEventResponse {
+    RacingEvent Event = 1;
+}
+
+message RacingEvent {
+    string                  ID              = 1;
+    string                  Name            = 2;
+    string                  StartTime       = 3;
+    string                  BettingStatus   = 4;
+    repeated model.Market   Markets         = 5;
+    bool                    Hidden          = 6;
+    string                  RaceType        = 7;
+    string                  Venue           = 8;
+    int64                   RaceNumber      = 9;
+    int64                   DistanceMetres  = 10;
+    string                  TrackCondition  = 11;
+    string                  Weather         = 12;
+    string                  Country         = 13;
+    string                  RaceClass       = 14;
+}
+
 service Service {
     // Update updates an Event and runs the pipeline of transformations
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
     // GetSportEvent retrieves a model.Event from the database and returns a core.SportEvent - this is a more UserConsumable representation of the model that is specific to sport events 
     rpc GetSportEvent(GetSportEventRequest) returns (GetSportEventResponse) {}
+    // GetRacingEvent retrieves a model.Event from the database and returns a core.RacingEvent - a consumer friendly representation of a horse / greyhound / harness race
+    rpc GetRacingEvent(GetRacingEventRequest) returns (GetRacingEventResponse) {}
 }

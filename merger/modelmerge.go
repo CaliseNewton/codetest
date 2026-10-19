@@ -62,6 +62,8 @@ func MergeEvent(ctx context.Context, left, right *model.Event) *model.Event {
 		result.Markets = mergedMarkets
 	}
 	result.EventTypeID = MergeOptionalString(ctx, left.EventTypeID, right.EventTypeID)
+	result.Hidden = right.Hidden // Copy primitive value from right, as non-pointers.
+	result.RacingData = MergeRaceEvent(ctx, left.RacingData, right.RacingData)
 	return result
 }
 
@@ -83,8 +85,56 @@ func MergeSportEvent(ctx context.Context, left, right *model.SportEvent) *model.
 	result.Region = MergeOptionalString(ctx, left.Region, right.Region)
 	result.League = MergeOptionalString(ctx, left.League, right.League)
 	result.Round = MergeOptionalString(ctx, left.Round, right.Round)
-	result.Hidden = right.Hidden
+	return result
+}
 
+// MergeRaceType generates a merged value between two members of the enumeration RaceType
+func MergeRaceType(ctx context.Context, left, right model.RaceType) model.RaceType {
+	// For enumerated types, we simply return the right operand
+	return right
+}
+
+// MergeOptionalRaceType generates a new instance of the OptionalRaceType type, where two input values are merged. Values on the left
+// are overwritten with values from the right where they exist, recursively.
+func MergeOptionalRaceType(ctx context.Context, left, right *model.OptionalRaceType) *model.OptionalRaceType {
+	// Handle trivial cases
+	if right == nil {
+		return left
+	}
+	if left == nil {
+		return right
+	}
+
+	// Create the new target
+	result := &model.OptionalRaceType{}
+
+	result.Value = MergeRaceType(ctx, left.Value, right.Value)
+	result.Deleted = right.Deleted // Copy primitive value from right, as non-pointers.
+	return result
+}
+
+// MergeRaceEvent generates a new instance of the RaceEvent type, where two input values are merged. Values on the left
+// are overwritten with values from the right where they exist, recursively.
+func MergeRaceEvent(ctx context.Context, left, right *model.RaceEvent) *model.RaceEvent {
+	// Handle trivial cases
+	if right == nil {
+		return left
+	}
+	if left == nil {
+		return right
+	}
+
+	// Create the new target
+	result := &model.RaceEvent{}
+
+	result.RaceType = MergeOptionalRaceType(ctx, left.RaceType, right.RaceType)
+	result.Venue = MergeOptionalString(ctx, left.Venue, right.Venue)
+	result.RaceNumber = MergeOptionalInt64(ctx, left.RaceNumber, right.RaceNumber)
+	result.DistanceMetres = MergeOptionalInt64(ctx, left.DistanceMetres, right.DistanceMetres)
+	result.TrackCondition = MergeOptionalString(ctx, left.TrackCondition, right.TrackCondition)
+	result.Weather = MergeOptionalString(ctx, left.Weather, right.Weather)
+	result.Country = MergeOptionalString(ctx, left.Country, right.Country)
+	result.RaceClass = MergeOptionalString(ctx, left.RaceClass, right.RaceClass)
 	return result
 }
 
