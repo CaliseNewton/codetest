@@ -31,7 +31,6 @@ message Event {
 
 // SportEvent models event details that are specific to sports
 message SportEvent {
-    reserved 5; // previously Hidden, moved to Event
     OptionalString Name     = 1;
     OptionalString Region   = 2;
     OptionalString League   = 3;
