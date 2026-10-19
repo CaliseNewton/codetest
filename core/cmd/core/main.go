@@ -12,6 +12,7 @@ import (
 	"github.com/CaliseNewton/codetest/core/repository"
 	"github.com/CaliseNewton/codetest/core/service"
 	"github.com/CaliseNewton/codetest/core/transforms"
+	"github.com/CaliseNewton/codetest/core/transforms/markettransform"
 	"github.com/CaliseNewton/codetest/core/transforms/racingtransform"
 	"github.com/CaliseNewton/codetest/core/transforms/sporttransform"
 	"github.com/CaliseNewton/codetest/merger"
@@ -49,6 +50,7 @@ func main() {
 			Transforms: []transforms.TransformClient{
 				sporttransform.NewSportTransformClient(),
 				racingtransform.NewRacingTransformClient(),
+				markettransform.NewMarketTransformClient(),
 			},
 		}
 

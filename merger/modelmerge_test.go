@@ -8,6 +8,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestMergeMarket_ClosedAt(t *testing.T) {
+	ctx := context.Background()
+	closed := &model.Market{ID: "mkt1", ClosedAt: &model.OptionalInt64{Value: 100}}
+
+	// a partial update without ClosedAt keeps the existing value
+	assert.Equal(t, int64(100), MergeMarket(ctx, closed, &model.Market{ID: "mkt1"}).GetClosedAt().GetValue())
+	// a delta with ClosedAt sets it
+	assert.Equal(t, int64(100), MergeMarket(ctx, &model.Market{ID: "mkt1"}, closed).GetClosedAt().GetValue())
+}
+
 func TestMergeRaceEvent_NilCases(t *testing.T) {
 	ctx := context.Background()
 	race := &model.RaceEvent{Venue: &model.OptionalString{Value: "Randwick"}}

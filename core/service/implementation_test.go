@@ -8,6 +8,7 @@ import (
 	"github.com/CaliseNewton/codetest/core/repository"
 	"github.com/CaliseNewton/codetest/core/service"
 	"github.com/CaliseNewton/codetest/core/transforms"
+	"github.com/CaliseNewton/codetest/core/transforms/markettransform"
 	"github.com/CaliseNewton/codetest/core/transforms/racingtransform"
 	"github.com/CaliseNewton/codetest/core/transforms/sporttransform"
 	"github.com/CaliseNewton/codetest/merger"
@@ -133,4 +134,56 @@ func TestService_IntegrationTest_GetRacingEventMissing(t *testing.T) {
 	resp, err := host.GetRacingEvent(context.Background(), &core.GetRacingEventRequest{EventID: "integration-test-does-not-exist"})
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Event)
+}
+
+func TestService_IntegrationTest_MarketClosedAt(t *testing.T) {
+	repo, err := repository.NewRedisRepository(context.Background(), "localhost:6379", "")
+	assert.NoError(t, err)
+	defer repo.DeleteEventByID(context.Background(), "integration-test-market-1")
+	host := &service.Service{
+		Upstreams: &service.Upstreams{
+			MergerClient: merger.NewInlineMergerClient(),
+			Repo:         repo,
+			Transforms: []transforms.TransformClient{
+				sporttransform.NewSportTransformClient(),
+				racingtransform.NewRacingTransformClient(),
+				markettransform.NewMarketTransformClient(),
+			},
+		},
+	}
+	setStatus := func(status model.BettingStatus, clientClosedAt *model.OptionalInt64) {
+		_, err := host.Update(context.Background(), &core.UpdateRequest{
+			Event: &model.Event{
+				ID:     "integration-test-market-1",
+				Hidden: true,
+				Markets: []*model.Market{
+					{ID: "mkt01", BettingStatus: &model.OptionalBettingStatus{Value: status}, ClosedAt: clientClosedAt},
+				},
+			},
+		})
+		assert.NoError(t, err)
+	}
+	getMarket := func() (*model.Market, bool) {
+		final, err := host.GetSportEvent(context.Background(), &core.GetSportEventRequest{EventID: "integration-test-market-1"})
+		assert.NoError(t, err)
+		return final.Event.Markets[0], final.Event.Hidden
+	}
+
+	// Open market, and a client supplied ClosedAt is ignored
+	setStatus(model.BettingStatus_BettingOpen, &model.OptionalInt64{Value: 1})
+	mkt, _ := getMarket()
+	assert.Nil(t, mkt.ClosedAt)
+
+	// First close sets ClosedAt and keeps the event hidden
+	setStatus(model.BettingStatus_BettingClosed, nil)
+	mkt, hidden := getMarket()
+	assert.NotNil(t, mkt.ClosedAt)
+	assert.True(t, hidden)
+	firstClose := mkt.ClosedAt.Value
+
+	// Reopen then close again, ClosedAt still records the first close
+	setStatus(model.BettingStatus_BettingOpen, nil)
+	setStatus(model.BettingStatus_BettingClosed, &model.OptionalInt64{Value: 1})
+	mkt, _ = getMarket()
+	assert.Equal(t, firstClose, mkt.ClosedAt.Value)
 }
