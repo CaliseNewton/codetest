@@ -9,6 +9,7 @@ import (
 	"github.com/CaliseNewton/codetest/core/repository"
 	"github.com/CaliseNewton/codetest/core/transforms"
 	"github.com/CaliseNewton/codetest/merger"
+	"github.com/CaliseNewton/codetest/model"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -32,6 +33,8 @@ func (host *Service) RegisterGRPCServerImplementations(grpcServer *grpc.Server) 
 
 // Update updates an Event and runs the pipeline of transformations
 func (host *Service) Update(ctx context.Context, req *core.UpdateRequest) (*core.UpdateResponse, error) {
+	stripClientClosedAt(req.GetEvent())
+
 	existing, err := host.Upstreams.Repo.GetEventByID(ctx, req.GetEvent().GetID())
 	if err != nil {
 		logrus.WithError(err).Error("Update: failed to retrieve event")
@@ -72,6 +75,14 @@ func (host *Service) Update(ctx context.Context, req *core.UpdateRequest) (*core
 	}
 
 	return resp, nil
+}
+
+// stripClientClosedAt removes any ClosedAt sent in a request. ClosedAt is an audit field that only markettransform
+// sets, from the market's BettingStatus, so a client supplied value is ignored rather than trusted.
+func stripClientClosedAt(event *model.Event) {
+	for _, market := range event.GetMarkets() {
+		market.ClosedAt = nil
+	}
 }
 
 // GetSportEvent retrieves a model.Event from the database and returns a core.SportEvent - this is a more UserConsumable representation of the model that is specific to sport events

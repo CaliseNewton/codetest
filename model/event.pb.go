@@ -890,6 +890,7 @@ type Market struct {
 	StartTime     *OptionalInt64         `protobuf:"bytes,3,opt,name=StartTime,proto3" json:"StartTime,omitempty"`
 	BettingStatus *OptionalBettingStatus `protobuf:"bytes,4,opt,name=BettingStatus,proto3" json:"BettingStatus,omitempty"`
 	Selections    []*Selection           `protobuf:"bytes,5,rep,name=Selections,proto3" json:"Selections,omitempty"`
+	ClosedAt      *OptionalInt64         `protobuf:"bytes,6,opt,name=ClosedAt,proto3" json:"ClosedAt,omitempty"` // unix nanos of the first close, set by markettransform only
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -954,6 +955,13 @@ func (x *Market) GetSelections() []*Selection {
 	return nil
 }
 
+func (x *Market) GetClosedAt() *OptionalInt64 {
+	if x != nil {
+		return x.ClosedAt
+	}
+	return nil
+}
+
 func (x *Market) SetID(v string) {
 	x.ID = v
 }
@@ -972,6 +980,10 @@ func (x *Market) SetBettingStatus(v *OptionalBettingStatus) {
 
 func (x *Market) SetSelections(v []*Selection) {
 	x.Selections = v
+}
+
+func (x *Market) SetClosedAt(v *OptionalInt64) {
+	x.ClosedAt = v
 }
 
 func (x *Market) HasName() bool {
@@ -995,6 +1007,13 @@ func (x *Market) HasBettingStatus() bool {
 	return x.BettingStatus != nil
 }
 
+func (x *Market) HasClosedAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.ClosedAt != nil
+}
+
 func (x *Market) ClearName() {
 	x.Name = nil
 }
@@ -1007,6 +1026,10 @@ func (x *Market) ClearBettingStatus() {
 	x.BettingStatus = nil
 }
 
+func (x *Market) ClearClosedAt() {
+	x.ClosedAt = nil
+}
+
 type Market_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -1015,6 +1038,7 @@ type Market_builder struct {
 	StartTime     *OptionalInt64
 	BettingStatus *OptionalBettingStatus
 	Selections    []*Selection
+	ClosedAt      *OptionalInt64
 }
 
 func (b0 Market_builder) Build() *Market {
@@ -1026,6 +1050,7 @@ func (b0 Market_builder) Build() *Market {
 	x.StartTime = b.StartTime
 	x.BettingStatus = b.BettingStatus
 	x.Selections = b.Selections
+	x.ClosedAt = b.ClosedAt
 	return m0
 }
 
@@ -1394,13 +1419,13 @@ const file_event_proto_rawDesc = "" +
 	"\x06Hidden\x18\b \x01(\bR\x06Hidden\x120\n" +
 	"\n" +
 	"RacingData\x18\t \x01(\v2\x10.model.RaceEventR\n" +
-	"RacingData\"\xc8\x01\n" +
+	"RacingData\"\xc2\x01\n" +
 	"\n" +
 	"SportEvent\x12)\n" +
 	"\x04Name\x18\x01 \x01(\v2\x15.model.OptionalStringR\x04Name\x12-\n" +
 	"\x06Region\x18\x02 \x01(\v2\x15.model.OptionalStringR\x06Region\x12-\n" +
 	"\x06League\x18\x03 \x01(\v2\x15.model.OptionalStringR\x06League\x12+\n" +
-	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05RoundJ\x04\b\x05\x10\x06\"S\n" +
+	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05Round\"S\n" +
 	"\x10OptionalRaceType\x12%\n" +
 	"\x05Value\x18\x01 \x01(\x0e2\x0f.model.RaceTypeR\x05Value\x12\x18\n" +
 	"\aDeleted\x18\x02 \x01(\bR\aDeleted\"\xb7\x03\n" +
@@ -1414,7 +1439,7 @@ const file_event_proto_rawDesc = "" +
 	"\x0eTrackCondition\x18\x05 \x01(\v2\x15.model.OptionalStringR\x0eTrackCondition\x12/\n" +
 	"\aWeather\x18\x06 \x01(\v2\x15.model.OptionalStringR\aWeather\x12/\n" +
 	"\aCountry\x18\a \x01(\v2\x15.model.OptionalStringR\aCountry\x123\n" +
-	"\tRaceClass\x18\b \x01(\v2\x15.model.OptionalStringR\tRaceClass\"\xed\x01\n" +
+	"\tRaceClass\x18\b \x01(\v2\x15.model.OptionalStringR\tRaceClass\"\x9f\x02\n" +
 	"\x06Market\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12)\n" +
 	"\x04Name\x18\x02 \x01(\v2\x15.model.OptionalStringR\x04Name\x122\n" +
@@ -1422,7 +1447,8 @@ const file_event_proto_rawDesc = "" +
 	"\rBettingStatus\x18\x04 \x01(\v2\x1c.model.OptionalBettingStatusR\rBettingStatus\x120\n" +
 	"\n" +
 	"Selections\x18\x05 \x03(\v2\x10.model.SelectionR\n" +
-	"Selections\"\xb7\x01\n" +
+	"Selections\x120\n" +
+	"\bClosedAt\x18\x06 \x01(\v2\x14.model.OptionalInt64R\bClosedAt\"\xb7\x01\n" +
 	"\tSelection\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12)\n" +
 	"\x04Name\x18\x02 \x01(\v2\x15.model.OptionalStringR\x04Name\x12B\n" +
@@ -1490,14 +1516,15 @@ var file_event_proto_depIdxs = []int32{
 	11, // 22: model.Market.StartTime:type_name -> model.OptionalInt64
 	2,  // 23: model.Market.BettingStatus:type_name -> model.OptionalBettingStatus
 	8,  // 24: model.Market.Selections:type_name -> model.Selection
-	9,  // 25: model.Selection.Name:type_name -> model.OptionalString
-	2,  // 26: model.Selection.BettingStatus:type_name -> model.OptionalBettingStatus
-	10, // 27: model.Selection.Price:type_name -> model.OptionalDouble
-	28, // [28:28] is the sub-list for method output_type
-	28, // [28:28] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	11, // 25: model.Market.ClosedAt:type_name -> model.OptionalInt64
+	9,  // 26: model.Selection.Name:type_name -> model.OptionalString
+	2,  // 27: model.Selection.BettingStatus:type_name -> model.OptionalBettingStatus
+	10, // 28: model.Selection.Price:type_name -> model.OptionalDouble
+	29, // [29:29] is the sub-list for method output_type
+	29, // [29:29] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_event_proto_init() }
