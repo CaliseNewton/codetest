@@ -14,11 +14,10 @@ Some basic assumptions made: default to visible / hidden = false, Not an optiona
 - Example payloads: `exampledata/03_new_race.json` and `exampledata/04_race_track_update.json`.
 
 ### **Task 3**
-- Added `ClosedAt` to `Market` as `OptionalInt64` (unix nanos), matching `Market.StartTime` and `Event.StartTime` in the model. Ints keep comparisons simple for date searches; formatting as a string belongs in the response layer.
+- Added `ClosedAt` to `Market` as `OptionalInt64` (unix nanos), matching `Market.StartTime` and `Event.StartTime` in the model.
 - Merged in `MergeMarket` with `MergeOptionalInt64`, so a partial update that doesn't mention `ClosedAt` leaves it alone.
 - Added `markettransform` (registered after the sport and racing transforms). For each market that is `BettingClosed` with no `ClosedAt`, it returns a delta containing only the market `ID` and `ClosedAt`. It is its own transform because markets exist on both sport and racing events. The clock is injectable so tests use a fixed time.
-- `Update` strips any `ClosedAt` sent by a client before merging (`stripClientClosedAt`), so the transform is the only thing that sets it.
-- Markets are returned as raw `model.Market` by `GetSportEvent` / `GetRacingEvent`, so `ClosedAt` comes back as `{"Value": <nanos>}`, the same as market `StartTime`. A `core.Market` view with string times would be a possible follow-up.
+- `Update` strips any `ClosedAt` sent by a client before merging (`stripClientClosedAt`), so the transform is the only thing that sets it. 
 - Example payload: `exampledata/05_close_market.json`.
 
 # Assumptions
