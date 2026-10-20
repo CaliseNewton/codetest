@@ -61,6 +61,17 @@ message RacingEvent {
     string                  RaceClass       = 14;
 }
 
+message SearchEventsRequest {
+    string                   StartFrom     = 1; // RFC3339, inclusive. Empty = no lower bound
+    string                   StartTo       = 2; // RFC3339, exclusive. Empty = no upper bound
+    optional model.BettingStatus BettingStatus = 3;
+    optional bool            Hidden        = 4; // unset = don't filter on display
+}
+
+message SearchEventsResponse {
+    repeated model.Event Events = 1;
+}
+
 service Service {
     // Update updates an Event and runs the pipeline of transformations
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
@@ -68,4 +79,6 @@ service Service {
     rpc GetSportEvent(GetSportEventRequest) returns (GetSportEventResponse) {}
     // GetRacingEvent retrieves a model.Event from the database and returns a core.RacingEvent - a consumer friendly representation of a horse / greyhound / harness race
     rpc GetRacingEvent(GetRacingEventRequest) returns (GetRacingEventResponse) {}
+    // SearchEventsRequest Searches by date and/or bettingstatus and/or display and returns a Slice of all Events which match the criteria
+    rpc SearchEvents(SearchEventsRequest) returns (SearchEventsResponse) {}
 }

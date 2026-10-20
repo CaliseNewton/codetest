@@ -82,17 +82,26 @@ func (c *mongoRepo) GetEventByID(ctx context.Context, id string) (*model.Event, 
 		return nil, err
 	}
 
+	event, err := documentToEvent(doc)
+	if err != nil {
+		logrus.Errorf("failed to convert event %v", err)
+		return nil, err
+	}
+
+	return event, nil
+}
+
+// documentToEvent converts a stored Mongo document back into a model.Event
+func documentToEvent(doc bson.M) (*model.Event, error) {
 	// _id is a Mongo field, not part of the Event model
 	delete(doc, "_id")
 	data, err := bson.MarshalExtJSON(doc, false, false)
 	if err != nil {
-		logrus.Errorf("could not convert document to json %v", err)
 		return nil, err
 	}
 
 	event := &model.Event{}
 	if err := json.Unmarshal(data, event); err != nil {
-		logrus.Errorf("failed to unmarshal event %v", err)
 		return nil, err
 	}
 
@@ -106,4 +115,58 @@ func (c *mongoRepo) DeleteEventByID(ctx context.Context, id string) error {
 	}
 
 	return err
+}
+
+// SearchEvents returns every event matching all of the criteria that are set, ordered by StartTime
+func (c *mongoRepo) SearchEvents(ctx context.Context, search EventSearch) ([]*model.Event, error) {
+	filter := bson.M{}
+
+	startRange := bson.M{}
+	if search.StartFrom != nil {
+		startRange["$gte"] = *search.StartFrom
+	}
+	if search.StartTo != nil {
+		startRange["$lt"] = *search.StartTo
+	}
+	if len(startRange) > 0 {
+		filter["StartTime.Value"] = startRange
+	}
+
+	if search.BettingStatus != nil {
+		filter["BettingStatus.Value"] = int32(*search.BettingStatus)
+	}
+
+	if search.Hidden != nil {
+		if *search.Hidden {
+			filter["Hidden"] = true
+		} else {
+			filter["Hidden"] = bson.M{"$ne": true} // false is never stored (omitempty), so "visible" means "not true"
+		}
+	}
+
+	opts := options.Find().SetSort(bson.D{{Key: "StartTime.Value", Value: 1}})
+	cursor, err := c.events.Find(ctx, filter, opts)
+	if err != nil {
+		logrus.Errorf("could not search events %v", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var docs []bson.M
+	if err := cursor.All(ctx, &docs); err != nil {
+		logrus.Errorf("could not read search results %v", err)
+		return nil, err
+	}
+
+	events := make([]*model.Event, 0, len(docs))
+	for _, doc := range docs {
+		event, err := documentToEvent(doc)
+		if err != nil {
+			logrus.Errorf("failed to convert event %v", err)
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	return events, nil
 }

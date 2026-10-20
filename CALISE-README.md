@@ -25,6 +25,13 @@ Some basic assumptions made: default to visible / hidden = false, Not an optiona
 - Added a `mongodb` service (`mongo:8`, port 27017) to `docker-compose.yml` and the `mongo-driver/v2` dependency.
 - Added `core/repository/mongodb.go` implementing the existing `Repository` interface, so nothing above the repository changes. Events go in an `events` collection with the event `ID` as `_id`; saves are upserts (`ReplaceOne` with upsert) and a missing event returns `nil, nil` like Redis.
 
+### **Task 5**
+- Added the `SearchEvents` RPC. Request: `StartFrom` / `StartTo` (RFC3339 strings, empty = no bound), `optional BettingStatus` and `optional bool Hidden` (unset = don't filter on it). Response: `repeated model.Event`, ordered by `StartTime`.
+- The handler in `implementation.go` validates and converts the request (`searchFromRequest`), then calls a new `Repository.SearchEvents` with `EventSearch` struct. The Mongo repository builds the filter from only the criteria that are set.
+- Invalid requests return `InvalidArgument`: no criteria, a time that isn't RFC3339, `StartFrom` not before `StartTo`, or `BettingUnknown`.
+- Cleaned up and removed old redis code (oringinally planned to leave in as an option to swap between them but mantaining both was not worth the effort).
+- Tests: repository search cases (each filter, combined, boundaries, empty result) against a separate test database, handler validation tests and an end-to-end search test.
+
 # Assumptions
 - **Plain bool merge (pinned, not yet confirmed as intended):** `MergeEvent` always takes `Hidden` from the right operand, because a plain bool cannot tell "not sent" apart from `false`. So any update or transform delta that leaves `Hidden` out makes the event visible again. All transforms copy `Hidden` from the full model into their deltas to avoid this, and clients must resend `Hidden` on every update. `TestMergeEvent_HiddenTakenFromRight` pins the current behaviour; revisit if partial updates should leave `Hidden` untouched.
 - Racing event types are identified by `EventTypeID` values `horse_racing`, `greyhound_racing` and `harness_racing`.
@@ -32,11 +39,14 @@ Some basic assumptions made: default to visible / hidden = false, Not an optiona
 - **Only a market's own `BettingStatus` sets `ClosedAt`.** Closing the event (`Event.BettingStatus = BettingClosed`) does not set `ClosedAt` on its markets if their own status is still open or suspended.
 - **`ClosedAt` is not accepted from requests.** It is treated as an audit field derived from the betting status, so any value a client sends is discarded in `Update`.
 - **`ClosedAt` uses server time** at the moment the transform sees the close, because updates don't carry a timestamp.
+- **Search dates filter on the event's `StartTime`.** `StartFrom` is inclusive and `StartTo` is exclusive, so a whole day is `StartFrom=2025-09-19T00:00:00Z`, `StartTo=2025-09-20T00:00:00Z`, and back-to-back ranges never return the same event twice. Events without a `StartTime` never match a date filter.
 
 # Decisions
 - `GetRacingEvent` returns an empty response (no error) both when the event does not exist and when it exists but is not a race (`RacingData` is nil). This matches how `GetSportEvent` handles a missing event.
 - Runner level data (barrier, jockey, ect) was left out of scope for Task 2.
 - **Mongo documents are encoded with `encoding/json`, not `protojson`.** `protojson` writes int64 values as strings, so `StartTime` date-range searches (Task 5) would only work by string comparison. With `encoding/json`, times are stored as numbers and can be range queried directly. The trade-off is that enums are stored as numbers (e.g. `BettingStatus.Value: 1`), queried in Go with the enum constants. `Hidden` is omitted when false, so "not hidden" queries use `{"Hidden": {$ne: true}}`.
+- **`SearchEvents` requires at least one criterion** so an empty request can't return the whole collection.
+- **`BettingUnknown` cannot be searched.** It is the enum's zero value, which `encoding/json` omits, so it is never stored and could not match.
 
 # AI Usage
 ### Claude chat:
@@ -47,3 +57,5 @@ Task 1: diagnosed why `Hidden` was not persisting (transform delta resetting it,
 # TODO (time permitting)
 - extend test cases + make test data more comprehensive. Maybe use provided exampledata ? 
 - Export and attach postman example requests to make demoing/manual testing easier
+- Add a result limit / paging to `SearchEvents`. A broad search such as `Hidden: false` on its own can still return most of the collection.
+- Return a friendlier summary type from `SearchEvents` instead of raw `model.Event`.

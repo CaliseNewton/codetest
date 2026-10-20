@@ -14,10 +14,12 @@ import (
 	"github.com/CaliseNewton/codetest/merger"
 	"github.com/CaliseNewton/codetest/model"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func TestService_IntegrationTest_NewEvent(t *testing.T) {
-	repo, err := repository.NewRedisRepository(context.Background(), "localhost:6379", "")
+	repo, err := repository.NewMongoRepository(context.Background(), "mongodb://localhost:27017", "codetest_service_search_test")
 	assert.NoError(t, err)
 	defer repo.DeleteEventByID(context.Background(), "integration-test-1")
 	host := &service.Service{
@@ -72,7 +74,7 @@ func TestService_IntegrationTest_NewEvent(t *testing.T) {
 }
 
 func TestService_IntegrationTest_NewRacingEvent(t *testing.T) {
-	repo, err := repository.NewRedisRepository(context.Background(), "localhost:6379", "")
+	repo, err := repository.NewMongoRepository(context.Background(), "mongodb://localhost:27017", "codetest_service_search_test")
 	assert.NoError(t, err)
 	defer repo.DeleteEventByID(context.Background(), "integration-test-race-1")
 	host := &service.Service{
@@ -127,7 +129,7 @@ func TestService_IntegrationTest_NewRacingEvent(t *testing.T) {
 }
 
 func TestService_IntegrationTest_GetRacingEventMissing(t *testing.T) {
-	repo, err := repository.NewRedisRepository(context.Background(), "localhost:6379", "")
+	repo, err := repository.NewMongoRepository(context.Background(), "mongodb://localhost:27017", "codetest_service_search_test")
 	assert.NoError(t, err)
 	host := &service.Service{Upstreams: &service.Upstreams{Repo: repo}}
 
@@ -137,7 +139,7 @@ func TestService_IntegrationTest_GetRacingEventMissing(t *testing.T) {
 }
 
 func TestService_IntegrationTest_MarketClosedAt(t *testing.T) {
-	repo, err := repository.NewRedisRepository(context.Background(), "localhost:6379", "")
+	repo, err := repository.NewMongoRepository(context.Background(), "localhost:6379", "")
 	assert.NoError(t, err)
 	defer repo.DeleteEventByID(context.Background(), "integration-test-market-1")
 	host := &service.Service{
@@ -186,4 +188,65 @@ func TestService_IntegrationTest_MarketClosedAt(t *testing.T) {
 	setStatus(model.BettingStatus_BettingClosed, &model.OptionalInt64{Value: 1})
 	mkt, _ = getMarket()
 	assert.Equal(t, firstClose, mkt.ClosedAt.Value)
+}
+
+// Invalid requests are rejected before the repository is used, so no database is needed
+func TestService_SearchEvents_Validation(t *testing.T) {
+	host := &service.Service{Upstreams: &service.Upstreams{}}
+	unknown := model.BettingStatus_BettingUnknown
+
+	tests := []struct {
+		name string
+		req  *core.SearchEventsRequest
+	}{
+		{name: "no criteria", req: &core.SearchEventsRequest{}},
+		{name: "StartFrom not RFC3339", req: &core.SearchEventsRequest{StartFrom: "19/09/2025"}},
+		{name: "StartTo not RFC3339", req: &core.SearchEventsRequest{StartTo: "2025-09-19"}},
+		{name: "StartFrom after StartTo", req: &core.SearchEventsRequest{StartFrom: "2025-09-20T00:00:00Z", StartTo: "2025-09-19T00:00:00Z"}},
+		{name: "StartFrom equal to StartTo", req: &core.SearchEventsRequest{StartFrom: "2025-09-19T00:00:00Z", StartTo: "2025-09-19T00:00:00Z"}},
+		{name: "BettingUnknown", req: &core.SearchEventsRequest{BettingStatus: &unknown}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resp, err := host.SearchEvents(context.Background(), tt.req)
+			assert.Nil(t, resp)
+			assert.Equal(t, codes.InvalidArgument, status.Code(err))
+		})
+	}
+}
+
+func TestService_IntegrationTest_SearchEvents(t *testing.T) {
+	repo, err := repository.NewMongoRepository(context.Background(), "mongodb://localhost:27017", "codetest_service_search_test")
+	assert.NoError(t, err)
+	host := &service.Service{
+		Upstreams: &service.Upstreams{
+			MergerClient: merger.NewInlineMergerClient(),
+			Repo:         repo,
+		},
+	}
+	defer repo.DeleteEventByID(context.Background(), "integration-test-search-1")
+	defer repo.DeleteEventByID(context.Background(), "integration-test-search-2")
+
+	for id, start := range map[string]int64{
+		"integration-test-search-1": 1758276000000000000, // 2025-09-19T10:00:00Z
+		"integration-test-search-2": 1758362400000000000, // 2025-09-20T10:00:00Z
+	} {
+		_, err := host.Update(context.Background(), &core.UpdateRequest{Event: &model.Event{
+			ID:            id,
+			StartTime:     &model.OptionalInt64{Value: start},
+			BettingStatus: &model.OptionalBettingStatus{Value: model.BettingStatus_BettingOpen},
+		}})
+		assert.NoError(t, err)
+	}
+
+	open := model.BettingStatus_BettingOpen
+	resp, err := host.SearchEvents(context.Background(), &core.SearchEventsRequest{
+		StartFrom:     "2025-09-19T00:00:00Z",
+		StartTo:       "2025-09-20T00:00:00Z",
+		BettingStatus: &open,
+	})
+	assert.NoError(t, err)
+	assert.Len(t, resp.Events, 1)
+	assert.Equal(t, "integration-test-search-1", resp.Events[0].GetID())
 }
