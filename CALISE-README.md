@@ -1,4 +1,4 @@
-# General notes (organise later)
+# Quick notes
 - modified run_local.sh to use core.exe for windows 
 - `vendor/` is git-ignored to keep diffs readable. Run `go mod vendor` after cloning for a vendored build; otherwise Go fetches the pinned versions from `go.mod` / `go.sum`.
 
@@ -54,7 +54,7 @@ Learning resource for understanding proto basics. Used for troubleshooting envir
 ### Claude Code:
 Task 1: diagnosed why `Hidden` was not persisting (transform delta resetting it, stale Postman service definition). Task 2: implemented the changes above from an outline I reviewed and adjusted. Task 3: implemented from an outline, with the `ClosedAt` behaviour decisions made by me. Task 4: used as learning aid for MongoDB setup. Reviewed my draft repository and completed it once I’d chosen the encoding approach
 
-# TODO (time permitting)
+# Future work (not done for this assessment)
 - extend test cases + make test data more comprehensive. Maybe use provided exampledata ? 
 - Export and attach postman example requests to make demoing/manual testing easier
 - Add a result limit / paging to `SearchEvents`. A broad search such as `Hidden: false` on its own can still return most of the collection.
