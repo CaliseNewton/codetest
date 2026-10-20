@@ -2,24 +2,15 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/CaliseNewton/codetest/model"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"google.golang.org/protobuf/encoding/protojson"
-)
-
-// Top level fields added next to the protojson event so it can be searched with proper types.
-// protojson writes int64 as strings and omits false bools, which makes range and "not hidden" queries unreliable.
-const (
-	searchStartTime     = "startTime"     // BSON date
-	searchBettingStatus = "bettingStatus" // enum name e.g. "BettingOpen"
-	searchHidden        = "hidden"        // always present, unlike protojson which omits false
 )
 
 type mongoRepo struct {
@@ -55,9 +46,10 @@ func (c *mongoRepo) HealthCheck(ctx context.Context) bool {
 	return true
 }
 
-// UpdateEvent upserts the event as its protojson document, keyed by the event ID, with the search fields added
+// UpdateEvent upserts the event, keyed by the event ID. It is converted through encoding/json (the same as the Redis
+// repository) so int64 values such as StartTime are stored as numbers and can be range queried. Enums are stored as numbers.
 func (c *mongoRepo) UpdateEvent(ctx context.Context, event *model.Event) error {
-	data, mErr := protojson.Marshal(event)
+	data, mErr := json.Marshal(event)
 	if mErr != nil {
 		logrus.Errorf("could not marshall event %v", mErr)
 		return mErr
@@ -69,11 +61,6 @@ func (c *mongoRepo) UpdateEvent(ctx context.Context, event *model.Event) error {
 		return err
 	}
 	doc["_id"] = event.ID
-	if event.GetStartTime() != nil {
-		doc[searchStartTime] = time.Unix(0, event.GetStartTime().GetValue()).UTC()
-	}
-	doc[searchBettingStatus] = event.GetBettingStatus().GetValue().String()
-	doc[searchHidden] = event.GetHidden()
 
 	_, err := c.events.ReplaceOne(ctx, bson.M{"_id": event.ID}, doc, options.Replace().SetUpsert(true))
 	if err != nil {
@@ -95,10 +82,8 @@ func (c *mongoRepo) GetEventByID(ctx context.Context, id string) (*model.Event, 
 		return nil, err
 	}
 
-	// _id and the search fields are not part of the Event model
-	for _, key := range []string{"_id", searchStartTime, searchBettingStatus, searchHidden} {
-		delete(doc, key)
-	}
+	// _id is a Mongo field, not part of the Event model
+	delete(doc, "_id")
 	data, err := bson.MarshalExtJSON(doc, false, false)
 	if err != nil {
 		logrus.Errorf("could not convert document to json %v", err)
@@ -106,7 +91,7 @@ func (c *mongoRepo) GetEventByID(ctx context.Context, id string) (*model.Event, 
 	}
 
 	event := &model.Event{}
-	if err := protojson.Unmarshal(data, event); err != nil {
+	if err := json.Unmarshal(data, event); err != nil {
 		logrus.Errorf("failed to unmarshal event %v", err)
 		return nil, err
 	}
