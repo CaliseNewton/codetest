@@ -3,6 +3,9 @@
 /bin/
 /tmp/
 
+#vendor folder
+/vendor/
+
 # Editor and OS files
 .vscode/
 .idea/
