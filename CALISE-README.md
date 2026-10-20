@@ -52,7 +52,7 @@ Some basic assumptions made: default to visible / hidden = false, Not an optiona
 ### Claude chat:
 Learning resource for understanding proto basics. Used for troubleshooting environment setup (Linux vs Windows).
 ### Claude Code:
-Task 1: diagnosed why `Hidden` was not persisting (transform delta resetting it, stale Postman service definition). Task 2: implemented the changes above from an outline I reviewed and adjusted. Task 3: implemented from an outline, with the `ClosedAt` behaviour decisions made by me. Task 4: used as learning aid for MongoDB setup. Reviewed my draft repository and completed it once I’d chosen the encoding approach
+Task 1: diagnosed why `Hidden` was not persisting (transform delta resetting it, stale Postman service definition). Task 2: implemented the changes above from an outline I reviewed and adjusted. Task 3: implemented from an outline, with the `ClosedAt` behaviour decisions made by me. Task 4: used as learning aid for MongoDB setup. Reviewed my draft repository and completed it once I’d chosen the encoding approach. Task 5: implemented intitial changes (later reviewed + refined myself)
 
 # Future work (not done for this assessment)
 - extend test cases + make test data more comprehensive. Maybe use provided exampledata ? 
