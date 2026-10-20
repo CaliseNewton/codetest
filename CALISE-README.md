@@ -1,5 +1,6 @@
 # General notes (organise later)
 - modified run_local.sh to use core.exe for windows 
+- `vendor/` is git-ignored to keep diffs readable. Run `go mod vendor` after cloning for a vendored build; otherwise Go fetches the pinned versions from `go.mod` / `go.sum`.
 
 # Notes from each Task
 ### **Task 1**
@@ -20,6 +21,10 @@ Some basic assumptions made: default to visible / hidden = false, Not an optiona
 - `Update` strips any `ClosedAt` sent by a client before merging (`stripClientClosedAt`), so the transform is the only thing that sets it. 
 - Example payload: `exampledata/05_close_market.json`.
 
+### **Task 4**
+- Added a `mongodb` service (`mongo:8`, port 27017) to `docker-compose.yml` and the `mongo-driver/v2` dependency.
+- Added `core/repository/mongodb.go` implementing the existing `Repository` interface, so nothing above the repository changes. Events go in an `events` collection with the event `ID` as `_id`; saves are upserts (`ReplaceOne` with upsert) and a missing event returns `nil, nil` like Redis.
+
 # Assumptions
 - **Plain bool merge (pinned, not yet confirmed as intended):** `MergeEvent` always takes `Hidden` from the right operand, because a plain bool cannot tell "not sent" apart from `false`. So any update or transform delta that leaves `Hidden` out makes the event visible again. All transforms copy `Hidden` from the full model into their deltas to avoid this, and clients must resend `Hidden` on every update. `TestMergeEvent_HiddenTakenFromRight` pins the current behaviour; revisit if partial updates should leave `Hidden` untouched.
 - Racing event types are identified by `EventTypeID` values `horse_racing`, `greyhound_racing` and `harness_racing`.
@@ -31,12 +36,13 @@ Some basic assumptions made: default to visible / hidden = false, Not an optiona
 # Decisions
 - `GetRacingEvent` returns an empty response (no error) both when the event does not exist and when it exists but is not a race (`RacingData` is nil). This matches how `GetSportEvent` handles a missing event.
 - Runner level data (barrier, jockey, ect) was left out of scope for Task 2.
+- **Mongo documents are encoded with `encoding/json`, not `protojson`.** `protojson` writes int64 values as strings, so `StartTime` date-range searches (Task 5) would only work by string comparison. With `encoding/json`, times are stored as numbers and can be range queried directly. The trade-off is that enums are stored as numbers (e.g. `BettingStatus.Value: 1`), queried in Go with the enum constants. `Hidden` is omitted when false, so "not hidden" queries use `{"Hidden": {$ne: true}}`.
 
 # AI Usage
 ### Claude chat:
 Learning resource for understanding proto basics. Used for troubleshooting environment setup (Linux vs Windows).
 ### Claude Code:
-Task 1: diagnosed why `Hidden` was not persisting (transform delta resetting it, stale Postman service definition). Task 2: implemented the changes above from an outline I reviewed and adjusted. Task 3: implemented from an outline, with the `ClosedAt` behaviour decisions made by me.
+Task 1: diagnosed why `Hidden` was not persisting (transform delta resetting it, stale Postman service definition). Task 2: implemented the changes above from an outline I reviewed and adjusted. Task 3: implemented from an outline, with the `ClosedAt` behaviour decisions made by me. Task 4: used as learning aid for MongoDB setup. Reviewed my draft repository and completed it once I’d chosen the encoding approach
 
 # TODO (time permitting)
 - extend test cases + make test data more comprehensive. Maybe use provided exampledata ? 
