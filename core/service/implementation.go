@@ -4,6 +4,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/CaliseNewton/codetest/core"
 	"github.com/CaliseNewton/codetest/core/repository"
@@ -12,6 +13,8 @@ import (
 	"github.com/CaliseNewton/codetest/model"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Upstreams defines dependencies the service has on other services
@@ -126,4 +129,67 @@ func (host *Service) GetRacingEvent(ctx context.Context, req *core.GetRacingEven
 	resp.Event = rslt
 
 	return resp, nil
+}
+
+// SearchEvents returns every event matching all of the supplied criteria (date range and/or betting status and/or display)
+func (host *Service) SearchEvents(ctx context.Context, req *core.SearchEventsRequest) (*core.SearchEventsResponse, error) {
+	search, err := searchFromRequest(req)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	events, err := host.Upstreams.Repo.SearchEvents(ctx, search)
+	if err != nil {
+		logrus.WithError(err).Error("SearchEvents: failed to search events")
+		return nil, err
+	}
+
+	return &core.SearchEventsResponse{Events: events}, nil
+}
+
+// searchFromRequest validates a SearchEventsRequest and converts it to repository search criteria
+func searchFromRequest(req *core.SearchEventsRequest) (repository.EventSearch, error) {
+	search := repository.EventSearch{}
+
+	if req.GetStartFrom() == "" && req.GetStartTo() == "" && !req.HasBettingStatus() && !req.HasHidden() {
+		return search, fmt.Errorf("at least one search criteria is required")
+	}
+
+	if req.GetStartFrom() != "" {
+		from, err := time.Parse(time.RFC3339, req.GetStartFrom())
+		if err != nil {
+			return search, fmt.Errorf("StartFrom must be an RFC3339 time e.g. 2025-09-19T00:00:00Z: %v", err)
+		}
+		fromNanos := from.UnixNano()
+		search.StartFrom = &fromNanos
+	}
+
+	if req.GetStartTo() != "" {
+		to, err := time.Parse(time.RFC3339, req.GetStartTo())
+		if err != nil {
+			return search, fmt.Errorf("StartTo must be an RFC3339 time e.g. 2025-09-20T00:00:00Z: %v", err)
+		}
+		toNanos := to.UnixNano()
+		search.StartTo = &toNanos
+	}
+
+	if search.StartFrom != nil && search.StartTo != nil && *search.StartFrom >= *search.StartTo {
+		return search, fmt.Errorf("StartFrom must be before StartTo")
+	}
+
+	if req.HasBettingStatus() {
+		// BettingUnknown is the zero value, which is never stored (omitempty), so it can't be matched
+		if req.GetBettingStatus() == model.BettingStatus_BettingUnknown {
+			return search, fmt.Errorf("BettingStatus BettingUnknown cannot be searched")
+		}
+		bettingStatus := req.GetBettingStatus()
+		search.BettingStatus = &bettingStatus
+	}
+
+	if req.HasHidden() {
+		hidden := req.GetHidden()
+		search.Hidden = &hidden
+	}
+
+	return search, nil
 }
