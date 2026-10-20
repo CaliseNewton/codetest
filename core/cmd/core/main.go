@@ -46,7 +46,7 @@ func main() {
 		// }
 
 		// MongoDB
-		repo, err := repository.NewMongoRepository(context.Background(), "localhost:27017", "")
+		repo, err := repository.NewMongoRepository(context.Background(), "mongodb://localhost:27017", "mongo_database")
 		if err != nil {
 			return err
 		}
